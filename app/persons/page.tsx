@@ -34,8 +34,6 @@ import {
 import { Trash2, Pencil, Plus, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const IMAGE_BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_BASE_URL || "";
-
 export default function PersonsPage() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
