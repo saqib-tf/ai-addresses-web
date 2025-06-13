@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 import { ErrorMessageDto } from "@/models/ErrorMessageDto";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const apiBaseUrl = process.env.NEXT_PUBLIC_WEB_API_BASE_URL;
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
