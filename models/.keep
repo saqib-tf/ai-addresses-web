@@ -1,0 +1,4 @@
+// This folder will contain TypeScript interfaces and types for API request and response DTOs.
+// Example usage:
+// export interface CountryResponse { ... }
+// export interface CreateCountryRequest { ... }
