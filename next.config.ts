@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         port: "3000",
         pathname: "/images/profile/**",
       },
-      new URL("https://saqibaiaddressimages.blob.core.windows.net/**"),
+      new URL("https://storeaiaddresses.blob.core.windows.net/**"),
     ],
   },
   output: "standalone",
