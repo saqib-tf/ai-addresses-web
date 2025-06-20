@@ -9,6 +9,13 @@ export default function UserAvatar() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<LoggedInUserDto | null>(null);
 
+  async function getUserInfo() {
+    const response = await fetch("/.auth/me");
+    const payload = await response.json();
+    const { clientPrincipal } = payload;
+    return clientPrincipal;
+  }
+
   useEffect(() => {
     if (!IS_PRODUCTION) {
       setUser({
@@ -20,12 +27,18 @@ export default function UserAvatar() {
         },
       });
     } else {
-      fetch("/.auth/me", { credentials: "same-origin" })
-        .then((res) => res.json())
-        .then((data: LoggedInUserDto) => {
-          setUser(data);
+      getUserInfo()
+        .then((clientPrincipal) => {
+          if (clientPrincipal) {
+            setUser({ clientPrincipal });
+          } else {
+            setUser(null);
+          }
         })
-        .catch(() => setUser(null));
+        .catch((error) => {
+          console.error("Failed to fetch user info:", error);
+          setUser(null);
+        });
     }
   }, []);
 
