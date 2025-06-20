@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function TopNavBar() {
   return (
@@ -15,6 +16,9 @@ export default function TopNavBar() {
         <Link href="/about" className="text-gray-700 dark:text-gray-200 hover:underline">
           About
         </Link>
+      </div>
+      <div className="flex gap-4 items-center">
+        <UserAvatar />
       </div>
     </nav>
   );
