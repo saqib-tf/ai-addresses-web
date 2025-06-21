@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
         pathname: "/images/profile/**",
       },
       new URL("https://storeaiaddresses.blob.core.windows.net/**"),
+      new URL("https://saqibaiaddressimages.blob.core.windows.net/**"),
     ],
   },
   output: "standalone",
