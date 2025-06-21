@@ -11,8 +11,8 @@ import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 export default function StateFormPage() {
   const router = useRouter();
   const params = useParams();
-  const countryId = Number(params.id);
-  const stateId = params.stateId ? Number(params.stateId) : undefined;
+  const countryId = Number(params?.id ?? 0);
+  const stateId = params?.stateId ? Number(params.stateId) : undefined;
   const isEdit = Boolean(stateId);
 
   const [name, setName] = useState("");

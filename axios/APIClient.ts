@@ -2,13 +2,11 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosE
 import { ErrorMessageDto } from "@/models/ErrorMessageDto";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_WEB_API_BASE_URL;
-const apiKey = process.env.NEXT_PUBLIC_X_API_KEY;
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
-    ...(apiKey ? { X_API_KEY: apiKey } : {}),
   },
 });
 
@@ -16,9 +14,6 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // You can add auth tokens or other headers here
-    if (apiKey) {
-      config.headers["X_API_KEY"] = apiKey;
-    }
     return config;
   },
   (error: AxiosError) => {
