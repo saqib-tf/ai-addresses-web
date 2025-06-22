@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { AddressService } from "@/services/AddressService";
-import { AddressTypeService } from "@/services/AddressTypeService";
-import { CountryService } from "@/services/CountryService";
-import { StateService } from "@/services/StateService";
+import { useAddressService } from "@/services/AddressService";
+import { useAddressTypeService } from "@/services/AddressTypeService";
+import { useCountryService } from "@/services/CountryService";
+import { useStateService } from "@/services/StateService";
 import { Address } from "@/models/Address";
 import { AddressType } from "@/models/AddressType";
 import { State } from "@/models/State";
@@ -29,6 +29,11 @@ export default function AddressFormPage() {
   const addressId = params?.addressId ? Number(params.addressId) : undefined;
   const isEdit = typeof addressId === "number" && !isNaN(addressId);
 
+  const addressService = useAddressService();
+  const addressTypeService = useAddressTypeService();
+  const countryService = useCountryService();
+  const stateService = useStateService();
+
   const [address, setAddress] = useState<Partial<Address>>({ personId });
   const [addressTypes, setAddressTypes] = useState<AddressType[]>([]);
   const [states, setStates] = useState<State[]>([]);
@@ -44,13 +49,13 @@ export default function AddressFormPage() {
       setError(null);
       try {
         const [addressTypesRes, countriesRes] = await Promise.all([
-          AddressTypeService.getAll(),
-          CountryService.getAll(),
+          addressTypeService.getAll(),
+          countryService.getAll(),
         ]);
         setAddressTypes(addressTypesRes);
         setCountries(countriesRes);
         if (isEdit && addressId) {
-          const addr = await AddressService.getById(addressId);
+          const addr = await addressService.getById(addressId);
           setAddress(addr);
           setSelectedCountryId(addr.countryId || addr.state?.countryId);
         }
@@ -68,7 +73,7 @@ export default function AddressFormPage() {
       if (selectedCountryId) {
         try {
           setLoading(true);
-          const result = await StateService.search({
+          const result = await stateService.search({
             countryId: selectedCountryId,
             pageNumber: 1,
             pageSize: 100,
@@ -93,9 +98,9 @@ export default function AddressFormPage() {
     setError(null);
     try {
       if (isEdit && addressId) {
-        await AddressService.update(addressId, address as Address);
+        await addressService.update(addressId, address as Address);
       } else {
-        await AddressService.create(address as Address);
+        await addressService.create(address as Address);
       }
       router.push(`/persons/${personId}/addresses`);
     } catch (err) {

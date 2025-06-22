@@ -3,6 +3,8 @@ import { ErrorMessageDto } from "@/models/ErrorMessageDto";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_WEB_API_BASE_URL;
 
+// console.log("id token in APIClient:", session?.id_token);
+
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   headers: {
@@ -13,7 +15,11 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // You can add auth tokens or other headers here
+    // Add Authorization header if id_token is available
+    // if (session && session.id_token) {
+    //   config.headers = config.headers || {};
+    // config.headers["Authorization"] = `Bearer session.id_token`;
+    // }
     return config;
   },
   (error: AxiosError) => {

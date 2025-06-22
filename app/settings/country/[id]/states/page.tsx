@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { State } from "@/models/State";
-import { StateService } from "@/services/StateService";
-import { CountryService } from "@/services/CountryService";
+import { useStateService } from "@/services/StateService";
+import { useCountryService } from "@/services/CountryService";
 import {
   Table,
   TableHeader,
@@ -35,6 +35,8 @@ import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 import { DEBOUNCE_SEARCH_MS } from "@/lib/constants";
 
 export default function CountryStatesPage() {
+  const stateService = useStateService();
+  const countryService = useCountryService();
   const params = useParams();
   const countryId = Number(params.id);
 
@@ -66,7 +68,8 @@ export default function CountryStatesPage() {
       sortDescending,
       countryId, // Pass countryId for server-side filtering
     };
-    StateService.search(query)
+    stateService
+      .search(query)
       .then((result: PagedResult<State>) => {
         setStates(result.items);
         setTotalCount(result.totalCount);
@@ -81,7 +84,8 @@ export default function CountryStatesPage() {
 
   useEffect(() => {
     if (!countryId) return;
-    CountryService.getById(countryId)
+    countryService
+      .getById(countryId)
       .then((country) => setCountryName(country.name))
       .catch(() => setCountryName(""));
   }, [countryId]);
@@ -97,7 +101,7 @@ export default function CountryStatesPage() {
   const handleDelete = async (id: number) => {
     setDeleting(true);
     try {
-      await StateService.delete(id);
+      await stateService.delete(id);
       toast.success("State deleted");
       setStates((prev) => prev.filter((s) => s.id !== id));
       setSelectedIds((prev) => prev.filter((sid) => sid !== id));
@@ -113,12 +117,12 @@ export default function CountryStatesPage() {
   const handleBulkDelete = async () => {
     setDeleting(true);
     try {
-      await Promise.all(selectedIds.map((id) => StateService.delete(id)));
+      await Promise.all(selectedIds.map((id) => stateService.delete(id)));
       toast.success("Selected states deleted");
       setStates((prev) => prev.filter((s) => !selectedIds.includes(s.id)));
       setSelectedIds([]);
     } catch (err: unknown) {
-      const msg = extractApiErrorMessage(err, "Failed to delete selected states");
+      const msg = extractApiErrorMessage(err, "Failed to delete states");
       toast.error(msg);
     } finally {
       setDeleting(false);

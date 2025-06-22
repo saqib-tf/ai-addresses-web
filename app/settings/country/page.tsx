@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Country } from "../../../models/Country";
-import { CountryService } from "../../../services/CountryService";
+import { useCountryService } from "@/services/CountryService";
 import {
   Table,
   TableHeader,
@@ -35,6 +35,7 @@ import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 import { DEBOUNCE_SEARCH_MS } from "@/lib/constants";
 
 export default function CountrySettingsPage() {
+  const countryService = useCountryService();
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +61,8 @@ export default function CountrySettingsPage() {
       pageNumber,
       pageSize,
     };
-    CountryService.search(query)
+    countryService
+      .search(query)
       .then((result: PagedResult<Country>) => {
         setCountries(result.items);
         setTotalCount(result.totalCount);
@@ -91,7 +93,7 @@ export default function CountrySettingsPage() {
     setDeleting(true);
     setError(null);
     try {
-      await CountryService.delete(id);
+      await countryService.delete(id);
       setDeleteId(null);
       fetchData();
       toast.success("Country deleted successfully");
@@ -122,7 +124,7 @@ export default function CountrySettingsPage() {
     setDeleting(true);
     setError(null);
     try {
-      await Promise.all(selectedIds.map((id) => CountryService.delete(id)));
+      await Promise.all(selectedIds.map((id) => countryService.delete(id)));
       setSelectedIds([]);
       setBulkDeleteDialogOpen(false);
       fetchData();

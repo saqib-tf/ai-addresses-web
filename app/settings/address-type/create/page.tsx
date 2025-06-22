@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter, useParams } from "next/navigation";
 import { AddressType } from "@/models/AddressType";
-import { AddressTypeService } from "@/services/AddressTypeService";
+import { useAddressTypeService } from "@/services/AddressTypeService";
 import { toast } from "sonner";
 import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 
@@ -14,6 +14,7 @@ export default function AddressTypeCreateOrEditPage() {
   const params = useParams();
   const id = params?.id ? Number(params.id) : undefined;
   const isEdit = !!id;
+  const addressTypeService = useAddressTypeService();
   const [form, setForm] = useState<Partial<AddressType>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,8 @@ export default function AddressTypeCreateOrEditPage() {
   useEffect(() => {
     if (isEdit && id) {
       setLoading(true);
-      AddressTypeService.getById(id)
+      addressTypeService
+        .getById(id)
         .then((data) => setForm(data))
         .catch((err: unknown) =>
           setError(extractApiErrorMessage(err, "Failed to load address type."))
@@ -40,10 +42,10 @@ export default function AddressTypeCreateOrEditPage() {
     setError(null);
     try {
       if (isEdit && id) {
-        await AddressTypeService.update(id, form as AddressType);
+        await addressTypeService.update(id, form as AddressType);
         toast.success("Address type updated successfully");
       } else {
-        await AddressTypeService.create(form as AddressType);
+        await addressTypeService.create(form as AddressType);
         toast.success("Address type created successfully");
       }
       router.push("/settings/address-type");

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import TopNavBar from "../components/TopNavBar";
 import { Toaster } from "@/components/ui/sonner";
 import "../app/globals.css";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black min-h-screen`}
       >
-        <TopNavBar />
-        <main className="flex flex-col flex-1 min-h-[calc(100vh-4rem)]">{children}</main>
-        <Toaster />
+        <SessionProvider>
+          <TopNavBar />
+          <main className="flex flex-col flex-1 min-h-[calc(100vh-4rem)]">{children}</main>
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   );

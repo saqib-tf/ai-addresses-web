@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Gender } from "../../../models/Gender";
-import { GenderService } from "../../../services/GenderService";
+import { useGenderService } from "../../../services/GenderService";
 import {
   Table,
   TableHeader,
@@ -33,8 +33,11 @@ import {
 import { toast } from "sonner";
 import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 import { DEBOUNCE_SEARCH_MS } from "@/lib/constants";
+import { useSession } from "next-auth/react";
 
 export default function GenderSettingsPage() {
+  const { status } = useSession();
+  const genderService = useGenderService();
   const [genders, setGenders] = useState<Gender[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +63,8 @@ export default function GenderSettingsPage() {
       pageNumber,
       pageSize,
     };
-    GenderService.search(query)
+    genderService
+      .search(query)
       .then((result: PagedResult<Gender>) => {
         setGenders(result.items);
         setTotalCount(result.totalCount);
@@ -74,9 +78,11 @@ export default function GenderSettingsPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    if (status !== "loading") {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchTerm, sortBy, sortDescending, pageNumber, pageSize]);
+  }, [debouncedSearchTerm, sortBy, sortDescending, pageNumber, pageSize, status]);
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -91,7 +97,7 @@ export default function GenderSettingsPage() {
     setDeleting(true);
     setError(null);
     try {
-      await GenderService.deleteGender(id);
+      await genderService.deleteGender(id);
       setDeleteId(null);
       fetchData();
       toast.success("Gender deleted successfully");
@@ -123,7 +129,7 @@ export default function GenderSettingsPage() {
     setDeleting(true);
     setError(null);
     try {
-      await Promise.all(selectedIds.map((id) => GenderService.deleteGender(id)));
+      await Promise.all(selectedIds.map((id) => genderService.deleteGender(id)));
       setSelectedIds([]);
       setBulkDeleteDialogOpen(false);
       fetchData();

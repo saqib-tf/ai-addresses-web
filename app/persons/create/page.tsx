@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { PersonService } from "@/services/PersonService";
-import { GenderService } from "@/services/GenderService";
+import { usePersonService } from "@/services/PersonService";
+import { useGenderService } from "@/services/GenderService";
 import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,8 @@ export default function PersonFormPage() {
   const params = useParams();
   const id = params?.id as string | undefined;
   const isEdit = Boolean(id);
+  const personService = usePersonService();
+  const genderService = useGenderService();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(getTodayDateString());
@@ -45,7 +47,8 @@ export default function PersonFormPage() {
   useEffect(() => {
     if (!isEdit) return;
     setInitialLoading(true);
-    PersonService.getById(Number(id))
+    personService
+      .getById(Number(id))
       .then((data: Person) => {
         setFirstName(data.firstName || "");
         setLastName(data.lastName || "");
@@ -58,7 +61,8 @@ export default function PersonFormPage() {
   }, [id, isEdit]);
 
   useEffect(() => {
-    GenderService.getAll()
+    genderService
+      .getAll()
       .then((genders) => {
         setGenders(genders);
         if (!isEdit && genders.length > 0) {
@@ -76,7 +80,7 @@ export default function PersonFormPage() {
     setError(null);
     try {
       if (isEdit) {
-        await PersonService.update(Number(id), {
+        await personService.update(Number(id), {
           firstName,
           lastName,
           dateOfBirth,
@@ -84,7 +88,7 @@ export default function PersonFormPage() {
           profilePictureUrl: profilePictureUrl || "",
         });
       } else {
-        await PersonService.create({
+        await personService.create({
           firstName,
           lastName,
           dateOfBirth,
@@ -105,7 +109,7 @@ export default function PersonFormPage() {
     if (fileItems.length > 0) {
       const file = fileItems[0].file;
       try {
-        const path = await PersonService.uploadImage(file);
+        const path = await personService.uploadImage(file);
         setProfilePictureUrl(path);
       } catch {
         setError("Failed to upload image");

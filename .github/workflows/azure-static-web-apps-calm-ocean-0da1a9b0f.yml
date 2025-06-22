@@ -22,6 +22,7 @@ jobs:
       - name: Generate Env File
         run: |
           echo 'NEXT_PUBLIC_WEB_API_BASE_URL=${{ secrets.NEXT_PUBLIC_WEB_API_BASE_URL }}' >> .env
+          echo 'AUTH_SECRET=${{ secrets.AUTH_SECRET }}' >> .env
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

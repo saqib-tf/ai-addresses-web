@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AddressService } from "@/services/AddressService";
+import { useAddressService } from "@/services/AddressService";
+import { usePersonService } from "@/services/PersonService";
 import { Address } from "@/models/Address";
 import { AddressSearchQuery } from "@/models/Address";
 import {
@@ -35,6 +36,8 @@ import { useDebounce } from "use-debounce";
 export default function PersonAddressesPage() {
   const params = useParams();
   const personId = params?.id ? Number(params.id) : undefined;
+  const addressService = useAddressService();
+  const personService = usePersonService();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,14 +58,15 @@ export default function PersonAddressesPage() {
     if (typeof personId === "number") {
       setLoading(true);
       setError(null);
-      AddressService.search({
-        personId,
-        searchTerm: debouncedSearchTerm,
-        sortBy,
-        sortDescending,
-        pageNumber,
-        pageSize,
-      } as AddressSearchQuery)
+      addressService
+        .search({
+          personId,
+          searchTerm: debouncedSearchTerm,
+          sortBy,
+          sortDescending,
+          pageNumber,
+          pageSize,
+        } as AddressSearchQuery)
         .then((result) => {
           setAddresses(result.items);
           setTotalCount(result.totalCount);
@@ -70,10 +74,8 @@ export default function PersonAddressesPage() {
         .catch((err: unknown) => setError(extractApiErrorMessage(err)))
         .finally(() => setLoading(false));
       // Fetch person name
-      import("@/services/PersonService").then(({ PersonService }) => {
-        PersonService.getById(personId).then((person) => {
-          setPersonName([person.firstName, person.lastName].filter(Boolean).join(" "));
-        });
+      personService.getById(personId).then((person) => {
+        setPersonName([person.firstName, person.lastName].filter(Boolean).join(" "));
       });
     }
   }, [personId, debouncedSearchTerm, sortBy, sortDescending, pageNumber, pageSize]);
@@ -82,7 +84,7 @@ export default function PersonAddressesPage() {
     setDeleteLoading(true);
     setError(null);
     try {
-      await AddressService.delete(id);
+      await addressService.delete(id);
       setAddresses((prev) => prev.filter((a) => a.id !== id));
     } catch (err) {
       setError(extractApiErrorMessage(err));
@@ -114,7 +116,7 @@ export default function PersonAddressesPage() {
     setError(null);
     try {
       for (const id of selectedIds) {
-        await AddressService.delete(id);
+        await addressService.delete(id);
       }
       setAddresses((prev) => prev.filter((a) => !selectedIds.has(a.id)));
       setSelectedIds(new Set());

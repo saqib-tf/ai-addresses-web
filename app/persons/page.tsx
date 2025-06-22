@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PersonService } from "@/services/PersonService";
+import { usePersonService } from "@/services/PersonService";
 import { Person } from "@/models/Person";
 import { PagedQuery } from "@/models/PagedQuery";
 import { PagedResult } from "@/models/PagedResult";
@@ -35,6 +35,7 @@ import { Trash2, Pencil, Plus, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PersonsPage() {
+  const personService = usePersonService();
   const [persons, setPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +65,8 @@ export default function PersonsPage() {
       sortBy,
       sortDescending,
     };
-    PersonService.search(query)
+    personService
+      .search(query)
       .then((result: PagedResult<Person>) => {
         setPersons(result.items);
         setTotalCount(result.totalCount);
@@ -102,7 +104,7 @@ export default function PersonsPage() {
     setDeleteLoading(true);
     setError(null);
     try {
-      await PersonService.delete(id);
+      await personService.delete(id);
       fetchData();
     } catch (err) {
       setError(extractApiErrorMessage(err));
@@ -143,7 +145,7 @@ export default function PersonsPage() {
                       setError(null);
                       try {
                         for (const id of selectedIds) {
-                          await PersonService.delete(id);
+                          await personService.delete(id);
                         }
                         setSelectedIds(new Set());
                         fetchData();

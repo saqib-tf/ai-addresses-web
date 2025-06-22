@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { IS_PRODUCTION } from "@/lib/constants";
 import { LoggedInUserDto } from "@/models/LoggedInUserDto";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SignIn } from "./auth-components";
 
 export default function UserAvatar() {
   const [open, setOpen] = useState(false);
@@ -73,12 +74,7 @@ export default function UserAvatar() {
           )}
         </>
       ) : (
-        <button
-          className="text-gray-700 dark:text-gray-200 hover:underline px-4 py-2 rounded"
-          onClick={() => (window.location.href = "/.auth/login/aad")}
-        >
-          Login
-        </button>
+        <SignIn />
       )}
     </div>
   );

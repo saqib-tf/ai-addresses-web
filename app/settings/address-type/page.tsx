@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AddressType } from "../../../models/AddressType";
-import { AddressTypeService } from "../../../services/AddressTypeService";
+import { useAddressTypeService } from "@/services/AddressTypeService";
 import {
   Table,
   TableHeader,
@@ -28,13 +28,13 @@ import {
 import { useDebounce } from "use-debounce";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { PagedQuery } from "../../../models/PagedQuery";
 import { PagedResult } from "../../../models/PagedResult";
 import { toast } from "sonner";
 import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 import { DEBOUNCE_SEARCH_MS } from "@/lib/constants";
 
 export default function AddressTypeSettingsPage() {
+  const addressTypeService = useAddressTypeService();
   const [addressTypes, setAddressTypes] = useState<AddressType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,14 +53,15 @@ export default function AddressTypeSettingsPage() {
 
   const fetchData = () => {
     setLoading(true);
-    const query: PagedQuery = {
+    const query = {
       searchTerm: debouncedSearchTerm || undefined,
       sortBy,
       sortDescending,
       pageNumber,
       pageSize,
     };
-    AddressTypeService.search(query)
+    addressTypeService
+      .search(query)
       .then((result: PagedResult<AddressType>) => {
         setAddressTypes(result.items);
         setTotalCount(result.totalCount);
@@ -91,7 +92,7 @@ export default function AddressTypeSettingsPage() {
     setDeleting(true);
     setError(null);
     try {
-      await AddressTypeService.delete(id);
+      await addressTypeService.delete(id);
       setDeleteId(null);
       fetchData();
       toast.success("Address type deleted successfully");
@@ -124,7 +125,7 @@ export default function AddressTypeSettingsPage() {
     setDeleting(true);
     setError(null);
     try {
-      await Promise.all(selectedIds.map((id) => AddressTypeService.delete(id)));
+      await Promise.all(selectedIds.map((id) => addressTypeService.delete(id)));
       setSelectedIds([]);
       setBulkDeleteDialogOpen(false);
       fetchData();

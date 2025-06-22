@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { StateService } from "@/services/StateService";
+import { useStateService } from "@/services/StateService";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ export default function StateFormPage() {
   const countryId = Number(params?.id ?? 0);
   const stateId = params?.stateId ? Number(params.stateId) : undefined;
   const isEdit = Boolean(stateId);
+  const stateService = useStateService();
 
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -24,7 +25,8 @@ export default function StateFormPage() {
   useEffect(() => {
     if (isEdit) {
       setLoading(true);
-      StateService.getById(stateId!)
+      stateService
+        .getById(stateId!)
         .then((data) => {
           setName(data.name);
           setCode(data.code);
@@ -40,10 +42,10 @@ export default function StateFormPage() {
     setError(null);
     try {
       if (isEdit) {
-        await StateService.update(stateId!, { id: stateId!, name, code, countryId, country: null });
+        await stateService.update(stateId!, { id: stateId!, name, code, countryId, country: null });
         toast.success("State updated");
       } else {
-        await StateService.create({ id: 0, name, code, countryId, country: null });
+        await stateService.create({ id: 0, name, code, countryId, country: null });
         toast.success("State created");
       }
       router.back();

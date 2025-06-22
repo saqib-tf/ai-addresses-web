@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import UserAvatar from "@/components/UserAvatar";
+import UserButton from "./user-button";
 
 export default function TopNavBar() {
   return (
@@ -18,7 +18,7 @@ export default function TopNavBar() {
         </Link>
       </div>
       <div className="flex gap-4 items-center">
-        <UserAvatar />
+        <UserButton />
       </div>
     </nav>
   );

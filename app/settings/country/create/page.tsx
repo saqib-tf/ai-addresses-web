@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Country } from "@/models/Country";
-import { CountryService } from "@/services/CountryService";
+import { useCountryService } from "@/services/CountryService";
 import { toast } from "sonner";
 import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 
@@ -14,6 +14,7 @@ export default function CountryFormPage() {
   const params = useParams();
   const id = params?.id ? Number(params.id) : undefined;
   const isEdit = !!id;
+  const countryService = useCountryService();
 
   const [form, setForm] = useState<Partial<Country>>({ code: "", name: "" });
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,8 @@ export default function CountryFormPage() {
   useEffect(() => {
     if (isEdit) {
       setLoading(true);
-      CountryService.getById(id!)
+      countryService
+        .getById(id!)
         .then((country) => setForm(country))
         .catch((err: unknown) => setError(extractApiErrorMessage(err, "Failed to load country.")))
         .finally(() => setLoading(false));
@@ -39,10 +41,10 @@ export default function CountryFormPage() {
     setError(null);
     try {
       if (isEdit) {
-        await CountryService.update(id!, form as Country);
+        await countryService.update(id!, form as Country);
         toast.success("Country updated successfully");
       } else {
-        await CountryService.create(form as Country);
+        await countryService.create(form as Country);
         toast.success("Country created successfully");
       }
       router.push("/settings/country");
